@@ -12,7 +12,7 @@ app.use(cors());
 const PORT = process.env.PORT || 3001;
 
 app.get('/weather', (request, response) => {
-  const allDailyForecasts = weatherData.data(day => new DailyForecast(day));
+  const allDailyForecasts = weatherData.data.map(day => new DailyForecast(day));
   response.send(allDailyForecasts);
 });
 
