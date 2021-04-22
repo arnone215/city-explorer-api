@@ -3,7 +3,7 @@
 const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
-
+const superagent = require('superagent');
 const weatherData = require('./data/weather.json');
 
 const app = express();
@@ -13,12 +13,22 @@ const PORT = process.env.PORT || 3001;
 
 app.get('/weather', (request, response) => {
   try {
-    const allDailyForecasts = weatherData.data.map(day => new DailyForecast(day));
-    response.json(allDailyForecasts);
+    const url = 'http://api.weatherbit.io/v2.0/forecast/daily';
+    const query = {
+      key: process.env.WEATHER_API_KEY,
+      lat: request.query.lat,
+      lon: request.query.lon,
+    };
+    superagent.get(url).query(query).then(forecast => {
+      console.log(forecast);
+      response.send(forecast.body.data.map(day => new DailyForecast(day)));
+    });
   } catch (error) {
     handleErrors(error, response);
   }
 });
+
+// Access the query parameters from the web client request object, to identify the exact location for which the web client is requesting weather info.
 
 
 
@@ -28,7 +38,15 @@ function DailyForecast(day) {
 }
 
 function handleErrors(error, response) {
-  response.status(500). send('internal error');
+  response.status(500).send('internal error');
 }
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+
+
+
+
+
+
+
+
