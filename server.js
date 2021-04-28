@@ -28,6 +28,23 @@ app.get('/weather', (request, response) => {
   }
 });
 
+app.get('/movies', (request, response) => {
+  try {
+    const url = 'http://api.themoviedb.org/3/movie/550';
+    const query = {
+      key: process.env.MOVIE_API_KEY,
+      title: '',
+      overview: ''
+    };
+    superagent.get(url).query(query).then(movie => {
+      console.log(movie);
+      response.send(movie.body.data.map(movie => new Movie(movie)));
+    });
+  } catch (error) {
+    handleErrors(error, response);
+  }
+});
+
 // Access the query parameters from the web client request object, to identify the exact location for which the web client is requesting weather info.
 
 
